@@ -3,35 +3,8 @@ public class EntornosFactorizar {
     
     
     public double calculaDato(double precioBase, int cantidad, double descuento, double impuestos, boolean tieneTarjetaFidelidad, double saldoTarjeta, boolean esOfertaEspecial, boolean esNavidad, boolean esMiembroVip, String metodoPago, boolean aplicarCuotas, int cuota, boolean esEnvioGratis, double precioEnvio, String tipoProducto, String categoriaProducto, String codigoCupon, Usuario usuario) {
-        double total = precioBase * cantidad;
-
        
-        if (descuento > 0) {
-            total -= total * (descuento / 100);
-        }
-
-   
-        if (tieneTarjetaFidelidad && saldoTarjeta > 0) {
-            total -= saldoTarjeta;
-        }
-
-       
-        total += total * (impuestos / 100);
-
-        if (esOfertaEspecial) {
-            total *= 0.9;
-        }
-
-     
-        if (esNavidad) {
-            total *= 0.85;
-        }
-
-     
-        if (esMiembroVip) {
-            total *= 0.8;
-        }
-
+        double total = aplicarDescuentosGenerales(precioBase, cantidad, descuento, tieneTarjetaFidelidad, saldoTarjeta, impuestos, esOfertaEspecial, esNavidad, esMiembroVip);
         
         if (metodoPago.equals("TarjetaCredito")) {
             total *= 1.05;
@@ -77,50 +50,58 @@ public class EntornosFactorizar {
 
         return total;
     }
-private double aplicarCuponDescuento(double total, String codigoCupon) {
-		/*
-		 * if (codigoCupon.equals("CUPOFF")) { total *= 0.8; } else if
-		 * (codigoCupon.equals("NAVIDAD2025")) { total *= 0.75; }
-		 */
-		// creamos una variable descuento que dependiendo del cupon tendra un valor
-		// diferente , y devuelve el total con el descuento aplicado
-		double descuento;
-		switch (codigoCupon) {
-		case "CUPOFF":
-			descuento = 0.8;
-			break;
-		case "NAVIDAD2025":
-			descuento = 0.75;
-			break;
-
-		default:
-			descuento = 1.0; // No se aplica descuento
+    
+    /*
+     * Metodo que devuelve el total base con los descuentos principales aplicados
+     */
+    private double aplicarDescuentosGenerales(double precioBase, int cantidad, double descuento, boolean tieneTarjetaFidelidad, double saldoTarjeta, double impuestos, boolean esOfertaEspecial, boolean esNavidad, boolean esMiembroVip) {
+		double total = precioBase * cantidad;
+		
+		if (descuento > 0) {
+			total -= total * (descuento / 100);
 		}
-		return total * descuento;
+
+		if (tieneTarjetaFidelidad && saldoTarjeta > 0) {
+			total -= saldoTarjeta;
+		}
+
+		total += total * (impuestos / 100);
+
+		if (esOfertaEspecial) {
+			total *= 0.9;
+		}
+
+		if (esNavidad) {
+			total *= 0.85;
+		}
+
+		if (esMiembroVip) {
+			total *= 0.8;
+		}
+
+		return total;
+		
 	}
+  
+    private double aplicarCuponDescuento(double total, String codigoCupon) {
+        if (codigoCupon.equals("CUPOFF")) {
+            total *= 0.8;
+        } else if (codigoCupon.equals("NAVIDAD2025")) {
+            total *= 0.75;
+        }
+        return total;
+    }
 
    
     private boolean validarProducto(String tipoProducto, String categoriaProducto) {
-
-        //Hecho por David Sánchez Lavado
-        //Usamos las coleccion set para eliminar los duplicados , 
-		//Con el .of introducimos los valores, significa que solo va a contener esos valores como por defecto no puede agregar ni eliminar ni modificar nada de esa lisa
-		//, con el map lo comparamos por clave 
-		/*
-		 * if (tipoProducto.equals("Electronico") &&
-		 * categoriaProducto.equals("Smartphones")) { return true; } else if
-		 * (tipoProducto.equals("Ropa") && categoriaProducto.equals("Hombre")) { return
-		 * true; } else if (tipoProducto.equals("Ropa") &&
-		 * categoriaProducto.equals("Mujer")) { return true; } return false;
-		 */
-		Set<String> categoriasElectronico = Set.of("Smartphones");
-		Set<String> categoriasRopa = Set.of("Hombre", "Mujer");
-
-		Map<String, Set<String>> productosValidos = Map.of(
-				"Electronico", categoriasElectronico,
-				"Ropa",categoriasRopa);
-
-		return productosValidos.containsKey(tipoProducto) && productosValidos.get(tipoProducto).contains(categoriaProducto);
+        if (tipoProducto.equals("Electronico") && categoriaProducto.equals("Smartphones")) {
+            return true;
+        } else if (tipoProducto.equals("Ropa") && categoriaProducto.equals("Hombre")) {
+            return true;
+        } else if (tipoProducto.equals("Ropa") && categoriaProducto.equals("Mujer")) {
+            return true;
+        }
+        return false;
     }
 
    
